@@ -10,11 +10,13 @@
  */
 /*jslint browser: true, nomen: true, white: true */
 /*properties
-    _activate, _options, _pausedInterval, _startTime, _timerFunction, _timerID,
-    extend, getTime, interval, kill, match, pause, pauseCallback, prototype,
-    resume, resumeCallback, start, startCallback, stop, stopCallback, timer,
-    timerCallback, useSetTimeout
+    '#LIST#', _activate, _options, _pausedInterval, _startTime, _status,
+    _timerFunction, _timerID, extend, getTime, indexOf, interval, kill, match,
+    pause, pauseCallback, prototype, push, resume, resumeCallback, splice, start,
+    startCallback, status, stop, stopCallback, timer, timerCallback,
+    useSetTimeout
 */
+
 
 var jQuery = typeof(jQuery) === 'undefined' ? null : jQuery;
 
@@ -46,6 +48,7 @@ var jQuery = typeof(jQuery) === 'undefined' ? null : jQuery;
         this._timerID = null;
         this._startTime = 0;
         this._pausedInterval = -1;
+        this._status = 'stopped';
     };
 
     Timer.prototype = {
@@ -59,6 +62,7 @@ var jQuery = typeof(jQuery) === 'undefined' ? null : jQuery;
             }
             this._activate();
             this._options.startCallback();
+            this._status = 'running';
         },
 
         pause: function() {
@@ -69,6 +73,7 @@ var jQuery = typeof(jQuery) === 'undefined' ? null : jQuery;
             this._pausedInterval = (new Date().getTime() - this._startTime) % this._options.interval;
             this._timerID = null;
             this._options.pauseCallback();
+            this._status = 'paused';
         },
 
         resume: function(fullFrame) {
@@ -88,6 +93,7 @@ var jQuery = typeof(jQuery) === 'undefined' ? null : jQuery;
                 this._activate();
             }
             this._options.resumeCallback();
+            this._status = 'running';
         },
 
         stop: function() {
@@ -99,6 +105,7 @@ var jQuery = typeof(jQuery) === 'undefined' ? null : jQuery;
             this._pausedInterval = -1;
             this._timerID = null;
             this._options.stopCallback();
+            this._status = 'stopped';
         },
 
         kill: function() {
@@ -107,11 +114,19 @@ var jQuery = typeof(jQuery) === 'undefined' ? null : jQuery;
                 this._startTime = 0;
                 this._pausedInterval = -1;
                 this._timerID = null;
+                this._status = 'stopped';
             }
+        },
+
+        status: function() {
+            return this._status;
         }
     };
 
     $.timer = function(name, callback, interval, options) {
+        if(typeof(name) === 'undefined') {
+            return $.timer['#LIST#'];
+        }
         if(typeof(name) !== 'string' || !name.match(/^[a-zA-Z][a-zA-Z_0-9]*$/)) {
             throw 'Invalid timer name (it must start with a letter and cannot contain other characters than letters, numbers and underscore';
         }
@@ -121,6 +136,10 @@ var jQuery = typeof(jQuery) === 'undefined' ? null : jQuery;
         if(callback === null) {
             $.timer[name].kill();
             delete($.timer[name]);
+            var list_index = $.timer['#LIST#'].indexOf(name);
+            if(list_index > -1) {
+                $.timer['#LIST#'].splice(list_index, 1);
+            }
             return true;
         }
         if(typeof(callback) !== 'function') {
@@ -136,7 +155,11 @@ var jQuery = typeof(jQuery) === 'undefined' ? null : jQuery;
         options.timerCallback = callback;
         options.interval = interval;
         $.timer[name] = new Timer(options);
-        return null;
+        $.timer['#LIST#'].push(name);
+
+        return $.timer[name];
     };
+
+    $.timer['#LIST#'] = [];
 
 }(jQuery));

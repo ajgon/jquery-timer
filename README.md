@@ -25,6 +25,14 @@ Start/pause/resume/stop timer:
     $.timer('my_timer').resume();
     $.timer('my_timer').stop();
 
+Get timer status:
+
+    $.timer('my_timer').status(); // => "stopped"
+
+Return timers list:
+
+    $.timer(); // => ["my_timer"]
+
 Delete timer:
 
     $.timer('my_timer', null);
@@ -82,6 +90,10 @@ Stops timer.
     kill(); // $.timer('name').kill();
 
 Similiar to stop(), but no callbacks are called.
+
+    status(); // $.timer('name').status();
+
+Returns status of the timer. Available responses are "stopped", "paused" and "running".
 
 ## Changelog
 
