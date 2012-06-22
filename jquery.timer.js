@@ -155,11 +155,13 @@ var jQuery = typeof(jQuery) === 'undefined' ? null : jQuery;
             return $.timer[name];
         }
         if(callback === null) {
-            $.timer[name].kill();
-            delete($.timer[name]);
-            var list_index = $.timer['#LIST#'].indexOf(name);
-            if(list_index > -1) {
-                $.timer['#LIST#'].splice(list_index, 1);
+            if($.timer[name]) {
+                $.timer[name].kill();
+                delete($.timer[name]);
+                var list_index = $.timer['#LIST#'].indexOf(name);
+                if(list_index > -1) {
+                    $.timer['#LIST#'].splice(list_index, 1);
+                }
             }
             return true;
         }
