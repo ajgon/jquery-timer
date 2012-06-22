@@ -10,13 +10,12 @@
  */
 /*jslint browser: true, nomen: true, white: true */
 /*properties
-    '#LIST#', _activate, _options, _pausedInterval, _startTime, _status,
-    _timerFunction, _timerID, extend, getTime, indexOf, interval, kill, match,
-    pause, pauseCallback, prototype, push, resume, resumeCallback, splice, start,
-    startCallback, status, stop, stopCallback, timer, timerCallback,
-    useSetTimeout
+    '#LIST#', _activate, _finish, _options, _passedTime, _pausedInterval,
+    _startTime, _status, _timerFunction, _timerID, extend, finishCallback,
+    getTime, indexOf, interval, kill, match, pause, pauseCallback, prototype,
+    push, resume, resumeCallback, splice, start, startCallback, status, stop,
+    stopCallback, timeout, timer, timerCallback, useSetTimeout
 */
-
 
 var jQuery = typeof(jQuery) === 'undefined' ? null : jQuery;
 
@@ -36,26 +35,50 @@ var jQuery = typeof(jQuery) === 'undefined' ? null : jQuery;
             pauseCallback:  function() {},
             resumeCallback: function() {},
             stopCallback:   function() {},
+            finishCallback: function() {},
             interval:       1000,
+            timeout:        false,
             useSetTimeout:  false
         };
 
         options.interval = parseInt(options.interval, 10);
         options.interval = isNaN(options.interval) ? defaults.interval : options.interval * 1000;
+        options.timeout = parseInt(options.timeout, 10);
+        options.timeout = isNaN(options.timeout) ? defaults.timeout : options.timeout * 1000;
         this._options = $.extend(defaults, options);
 
         this._timerFunction = options.useSetTimeout ? 'Timeout' : 'Interval';
         this._timerID = null;
         this._startTime = 0;
         this._pausedInterval = -1;
+        this._passedTime = 0;
         this._status = 'stopped';
     };
 
     Timer.prototype = {
         _activate: function() {
+            var self = this;
             this._startTime = new Date().getTime();
-            this._timerID = window['set' + this._timerFunction](this._options.timerCallback, this._options.interval);
+            this._timerID = window['set' + this._timerFunction](function() {
+                self._passedTime = (new Date().getTime() - self._startTime);
+                if(self._options.timeout && self._passedTime >= self._options.timeout) {
+                    self._finish();
+                } else {
+                    self._options.timerCallback();
+                }
+            }, this._options.interval);
         },
+
+        _finish: function() {
+            window['clear' + this._timerFunction](this._timerID);
+            this._startTime = 0;
+            this._pausedInterval = -1;
+            this._passedTime = 0;
+            this._timerID = null;
+            this._options.finishCallback();
+            this._status = 'finished';
+        },
+
         start: function() {
             if(this._startTime !== 0) {
                 throw 'Timer is running';
@@ -70,7 +93,8 @@ var jQuery = typeof(jQuery) === 'undefined' ? null : jQuery;
                 throw 'Timer not started';
             }
             window['clear' + this._timerFunction](this._timerID);
-            this._pausedInterval = (new Date().getTime() - this._startTime) % this._options.interval;
+            this._passedTime = (new Date().getTime() - this._startTime);
+            this._pausedInterval = this._passedTime % this._options.interval;
             this._timerID = null;
             this._options.pauseCallback();
             this._status = 'paused';
@@ -100,10 +124,7 @@ var jQuery = typeof(jQuery) === 'undefined' ? null : jQuery;
             if(this._startTime === 0 || this._timerID === null) {
                 throw 'Timer not started';
             }
-            window['clear' + this._timerFunction](this._timerID);
-            this._startTime = 0;
-            this._pausedInterval = -1;
-            this._timerID = null;
+            this._finish();
             this._options.stopCallback();
             this._status = 'stopped';
         },

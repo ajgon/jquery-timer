@@ -37,6 +37,10 @@ Delete timer:
 
     $.timer('my_timer', null);
 
+Create timer with 1 second interval and working 1 minute
+
+    $.timer('other_timer', function() { /* my Callback Code */ }, 1, {timeout: 60});
+
 Function definition:
 
     $.timer(name, callback, interval, options);
@@ -63,11 +67,19 @@ Hash of additional options for Timer class.
 
     useSetTimeout: false
 
-If set to true JS setTimeout() function will be used instead of setInterval().
+If set to true JS setTimeout() function will be used instead of setInterval(). This is not recommended, consider using "timeout" option.
+
+    timeout: false
+
+If set to integer, interval timer will work only this parameter value seconds.
 
     startCallback/pauseCallback/resumeCallback/stopCallback: function() {}
 
 Callbacks called after corresponding actions are finished.
+
+    finishCallback: function() {}
+
+Callback working only with "timeout" option. It is called when timer is finished.
 
 ## Methods
 
@@ -85,7 +97,7 @@ Resumes timer. It takes into consideration the time of the cycle when timer was 
 
     stop(); // $.timer('name').stop();
 
-Stops timer.
+Stops timer. Also fires finishCallback() if timeout option is set.
 
     kill(); // $.timer('name').kill();
 
@@ -93,9 +105,7 @@ Similiar to stop(), but no callbacks are called.
 
     status(); // $.timer('name').status();
 
-Returns status of the timer. Available responses are "stopped", "paused" and "running".
-
-## Changelog
+Returns status of the timer. Available responses are "stopped", "paused", "running" and "finished".
 
 ## Development
 
