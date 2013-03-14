@@ -42,9 +42,9 @@ var jQuery = typeof(jQuery) === 'undefined' ? null : jQuery;
         };
 
         options.interval = parseInt(options.interval, 10);
-        options.interval = isNaN(options.interval) ? defaults.interval : options.interval * 1000;
+        options.interval = isNaN(options.interval) ? defaults.interval : options.interval;
         options.timeout = parseInt(options.timeout, 10);
-        options.timeout = isNaN(options.timeout) ? defaults.timeout : options.timeout * 1000;
+        options.timeout = isNaN(options.timeout) ? defaults.timeout : options.timeout;
         this._options = $.extend(defaults, options);
 
         this._timerFunction = options.useSetTimeout ? 'Timeout' : 'Interval';
