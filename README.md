@@ -57,7 +57,7 @@ A callback function which will be passed to setTimeout/setInterval function.
 
     interval: <mandatory>
 
-Interval (in seconds) after which callback should be invoked.
+Interval (in milliseconds) after which callback should be invoked.
 
     options: {}
 
@@ -71,7 +71,7 @@ If set to true JS setTimeout() function will be used instead of setInterval(). T
 
     timeout: false
 
-If set to integer, interval timer will work only this parameter value seconds.
+If set to integer, timer function will stop after specified milliseconds.
 
     startCallback/pauseCallback/resumeCallback/stopCallback: function() {}
 
