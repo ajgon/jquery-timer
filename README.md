@@ -39,7 +39,7 @@ Delete timer:
 
 Create timer with 1 second interval and working 1 minute
 
-    $.timer('other_timer', function() { /* my Callback Code */ }, 1, {timeout: 60});
+    $.timer('other_timer', function() { /* my Callback Code */ }, 1000, {timeout: 60000});
 
 Function definition:
 
